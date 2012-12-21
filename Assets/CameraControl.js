@@ -16,4 +16,12 @@ function Update () {
 	size += change;
 	if (size < 1 ) size = 1; 
 	camera.orthographicSize = size;
+
+	// var ray : Ray = camera.ScreenPointToRay (Input.mousePosition);
+	// // var hit : RaycastHit;
+	// var target = Vector3(ray.origin.x, 0, 0);
+	// Debug.Log(target);
+ //    Debug.DrawRay (ray.origin, ray.direction * 10, Color.yellow);
+ //    Player.LookAt(target);
+
 }

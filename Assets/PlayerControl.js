@@ -1,6 +1,9 @@
 #pragma strict
 
-public var horizontal_force = 1;
+private var horizontal_force = 10;
+private var	max_horizontal_speed = 5;
+private var jump_upward_velocity = 10;
+private var min_jump_velocity = 5;
 
 function Start () {
 
@@ -17,6 +20,39 @@ function FixedUpdate () {
 	var force = -Vector3.right * horizontal_input;
 	rigidbody.AddForce(force);
 
-	Debug.Log(Input.mousePosition);
+	// curb velocity
+	if (rigidbody.velocity.x > max_horizontal_speed) {
+		rigidbody.velocity.x = max_horizontal_speed;
+	}
+	if (rigidbody.velocity.x < -max_horizontal_speed) {
+		rigidbody.velocity.x = -max_horizontal_speed;
+	}
 
+
+
+	// jump mechanics
+
+	// jump from ground
+    if (Input.GetAxis("Jump") && Physics.Raycast (transform.position, -Vector3.up, 1.0)) {
+		rigidbody.velocity = rigidbody.velocity + (Vector3.up * jump_upward_velocity);
+		Debug.DrawRay(transform.position, -Vector3.up * 1);
+	}
+
+	// release jump in air
+	if (!Input.GetAxis("Jump") && (rigidbody.velocity.y > 0)) {
+		if (rigidbody.velocity.y > min_jump_velocity) {
+			rigidbody.velocity = rigidbody.velocity + -(Vector3.up * min_jump_velocity);
+
+		}
+	}
+
+
+
+	// player face mouse;
+	if (Input.mousePosition.x > (Screen.width / 2)) {
+		transform.eulerAngles.y = 0;
+	}
+	else {
+		transform.eulerAngles.y = 180;
+	}
 }
