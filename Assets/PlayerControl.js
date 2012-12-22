@@ -2,8 +2,8 @@
 
 private var horizontal_force = 10;
 private var	max_horizontal_speed = 5;
-private var jump_upward_velocity = 10;
-private var min_jump_velocity = 5;
+private var jump_upward_velocity = 1;
+private var min_jump_velocity = 3;
 
 function Start () {
 
@@ -33,7 +33,7 @@ function FixedUpdate () {
 	// jump mechanics
 
 	// jump from ground
-    if (Input.GetAxis("Jump") && Physics.Raycast (transform.position, -Vector3.up, 1.0)) {
+    if (Input.GetAxis("Jump") && Physics.Raycast (transform.position, -Vector3.up, 1.5)) {
 		rigidbody.velocity = rigidbody.velocity + (Vector3.up * jump_upward_velocity);
 		Debug.DrawRay(transform.position, -Vector3.up * 1);
 	}
