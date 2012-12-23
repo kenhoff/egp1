@@ -21,3 +21,7 @@ function FixedUpdate () {
 	}
 
 }
+
+function OnDrawGizmosSelected() {
+	Gizmos.DrawWireSphere(transform.position, radius);
+}
