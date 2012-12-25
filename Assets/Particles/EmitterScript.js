@@ -19,5 +19,4 @@ function Update () {
 			accum_time = 0;
 	}
 	accum_time += Time.deltaTime;
-	// Debug.Log(accum_time);
 }

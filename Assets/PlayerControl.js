@@ -7,12 +7,19 @@ private var min_jump_velocity = 3;
 
 private var terrain_raycast_mask = (1<<9);
 private var beam_raycast_mask = (1<<11);
+private var everything_but_particles_mask = ~(1<<8);
 
-public var HeatRayObject : GameObject;
-public var FreezeRayObject : GameObject;
+public var SteamPrefab : Transform;
+public var WaterPrefab : Transform;
+public var IcePrefab : Transform;
+public var particle_root : Transform;
+
+public var BeamObject : GameObject;
+
+private var heat_ray : System.Boolean;
 
 function Start () {
-
+	heat_ray = true;
 }
 
 function Update () {
@@ -71,41 +78,82 @@ function FixedUpdate () {
 	// beams
 
 	if (Input.GetButton("Fire1")) {
+
+		// sort out position vectors
+
 		var pos = Input.mousePosition;
 		var center = Vector3(Screen.width/2, Screen.height/2, 0);
 		var dir = pos - center;
 		dir.x = -dir.x;
-		// Debug.Log(dir);
-		// Debug.DrawRay(transform.position, dir);
-
 		var hit : RaycastHit;
-		Physics.Raycast(transform.position, dir, hit);
+		Physics.Raycast(transform.position, dir, hit, Mathf.Infinity, everything_but_particles_mask);
 		var end_beam_location = transform.position + (dir.normalized * hit.distance);
 		Debug.DrawLine(transform.position, end_beam_location);
 
+		// change particles
 
-		var angle_of_mousecursor = Mathf.Rad2Deg * Mathf.Atan2( (Input.mousePosition.y - Screen.width/2) , (Input.mousePosition.x - Screen.height/2));
-		Debug.Log(angle_of_mousecursor);
-
-
-		// var capsule_hit : RaycastHit;
-		// if  (Physics.CapsuleCast (transform.position, end_beam_location, 1, Vector3.zero, capsule_hit)) {
-		// 	Debug.Log("hit!");
-		// 	Debug.Log(capsule_hit.collider);
-		// }
-		if (!HeatRayObject.activeSelf) {
-			HeatRayObject.SetActive(true);
+		if (Physics.Linecast(transform.position, end_beam_location, hit, ~terrain_raycast_mask)) {
+			// Debug.Log(hit.collider);
+			if (heat_ray) {
+				if (hit.collider.gameObject.tag == "Water") {
+					var location = hit.collider.gameObject.transform.position;
+					Destroy(hit.collider.gameObject);
+					var clone = Instantiate (SteamPrefab, location, Quaternion.identity);
+					clone.parent = particle_root;
+				}
+				if (hit.collider.gameObject.tag == "Ice") {
+					location = hit.collider.gameObject.transform.position;
+					Destroy(hit.collider.gameObject);
+					clone = Instantiate (WaterPrefab, location, Quaternion.identity);
+					clone.parent = particle_root;
+				}
+			}
+			else {
+				if (hit.collider.gameObject.tag == "Steam") {
+					location = hit.collider.gameObject.transform.position;
+					Destroy(hit.collider.gameObject);
+					clone = Instantiate (WaterPrefab, location, Quaternion.identity);
+					clone.parent = particle_root;
+				}
+				if (hit.collider.gameObject.tag == "Water") {
+					location = hit.collider.gameObject.transform.position;
+					Destroy(hit.collider.gameObject);
+					clone = Instantiate (IcePrefab, location, Quaternion.identity);
+					clone.parent = particle_root;
+				}
+			}
 		}
-		HeatRayObject.transform.position = transform.position;
-		HeatRayObject.transform.localScale = Vector3(1, hit.distance, 1);
-		HeatRayObject.transform.eulerAngles = Vector3(0, 0, -angle_of_mousecursor + 85);
-		HeatRayObject.transform.position = transform.position + ((end_beam_location- transform.position) / 2);
+
+		if (BeamObject.activeSelf == false) {
+			BeamObject.SetActive(true);
+		}
+
+		BeamObject.transform.position = transform.position;
+		BeamObject.GetComponent(LineRenderer).SetPosition(0, transform.position);
+		BeamObject.GetComponent(LineRenderer).SetPosition(1, end_beam_location);
+		if (heat_ray) {
+			BeamObject.GetComponent(LineRenderer).SetColors(Color.red, Color.red);
+		}
+		else {
+			BeamObject.GetComponent(LineRenderer).SetColors(Color.blue, Color.blue);
+		}
 
 	}
 	else {
-		HeatRayObject.SetActive(false);
-		FreezeRayObject.SetActive(false);
+		// set beam renderer to inactive
+		BeamObject.SetActive(false);
 	}
+
+	if (Input.GetButton("Fire2")) {
+		if (heat_ray) {
+			heat_ray = false;
+		}
+		else {
+			heat_ray = true;
+		}
+	}
+
+	// Debug.Log(heat_ray);
 
 }
 
