@@ -24,11 +24,11 @@ function Update () {
 	// beams
 
 	if (Input.GetButton("Fire1")) {
-		FireBeam(heat_ray);
+		FireBeam(!heat_ray);
 	
 	}
 	else if (Input.GetButton("Fire2")) {
-		FireBeam(!heat_ray);
+		FireBeam(heat_ray);
 	}
 	else {
 		// set beam renderer to inactive
