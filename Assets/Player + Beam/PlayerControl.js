@@ -18,6 +18,10 @@ function Start () {
 
 function Update () {
 	time_since_jump += Time.deltaTime;
+
+	if (Input.GetKey(KeyCode.R)) {
+		Application.LoadLevel(Application.loadedLevel);
+	}
 }
 
 function FixedUpdate () {
@@ -44,7 +48,8 @@ function FixedUpdate () {
 	// jump from ground
 
 	var jump_raycast_dist = 1.2;
-	var on_ground : System.Boolean = Physics.Raycast (transform.position, -Vector3.up, jump_raycast_dist, terrain_raycast_mask + ice_raycast_mask) || Physics.Raycast (transform.position + (Vector3.right * .5), -Vector3.up, jump_raycast_dist, terrain_raycast_mask + ice_raycast_mask) || Physics.Raycast (transform.position + (-Vector3.right * .5), -Vector3.up, jump_raycast_dist, terrain_raycast_mask + ice_raycast_mask);
+	var jump_raycast_width = .4;
+	var on_ground : System.Boolean = Physics.Raycast (transform.position, -Vector3.up, jump_raycast_dist, terrain_raycast_mask + ice_raycast_mask) || Physics.Raycast (transform.position + (Vector3.right * jump_raycast_width), -Vector3.up, jump_raycast_dist, terrain_raycast_mask + ice_raycast_mask) || Physics.Raycast (transform.position + (-Vector3.right * jump_raycast_width), -Vector3.up, jump_raycast_dist, terrain_raycast_mask + ice_raycast_mask);
 
     if (Input.GetButton("Jump") && on_ground && (time_since_jump >= time_between_jumps)) {
 		rigidbody.velocity = rigidbody.velocity + (Vector3.up * jump_upward_velocity);
@@ -53,8 +58,8 @@ function FixedUpdate () {
 	}
 
 	Debug.DrawRay(transform.position, -Vector3.up * jump_raycast_dist);
-	Debug.DrawRay(transform.position + (Vector3.right * .5), -Vector3.up * jump_raycast_dist);
-	Debug.DrawRay(transform.position + (-Vector3.right * .5), -Vector3.up * jump_raycast_dist);
+	Debug.DrawRay(transform.position + (Vector3.right * jump_raycast_width), -Vector3.up * jump_raycast_dist);
+	Debug.DrawRay(transform.position + (-Vector3.right * jump_raycast_width), -Vector3.up * jump_raycast_dist);
 
 	// release jump in air
 
